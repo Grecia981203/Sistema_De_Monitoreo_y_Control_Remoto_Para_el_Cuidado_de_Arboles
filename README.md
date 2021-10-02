@@ -1,0 +1,2 @@
+# Sistema_De_Monitoreo_y_Control_Remoto_Para_el_Cuidado_de_Arboles
+Se encuentran disponibles todos los códigos, configuraciones y videos de pruebas realizados para la implementación del Trabajo Terminal de UPIITA, titulado "Sistema de Monitoreo y Control Remoto para el Cuidado de Árboles". Las carpetas están organizadas de acuerdo a los Sistemas(S#) y Módulos(M#) mostrados en la imagen "Arquitectura Física". Para mas información leer el archivo "README.txt".
