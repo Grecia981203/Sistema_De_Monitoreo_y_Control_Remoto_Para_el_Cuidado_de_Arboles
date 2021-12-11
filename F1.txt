@@ -1,0 +1,151 @@
+#include <TimeLib.h>
+
+int Led_V = 11;
+int Led_S = 12;
+
+long Med_D;
+long Rie_D;
+long Horas_Del_Dia = 24;
+int hor_M;  //Cada cuantas horas se mide
+int hor_R;  //Minutos que se le suman a las horas en que se mide
+int min_M;  //Cada cuantas horas se riega
+int min_R;  //Minutos que se le suman a las horas en que se riega
+time_t fecha,Fecha_C, Fecha_R, Fecha_M;
+
+void Intervalos(){
+  Serial.print("Mediciones al día: ");
+  while(Serial.available()==0)
+  {
+    //No hagas nada si no recibes nada
+  }
+  if(Serial.available()){
+    Med_D = Serial.parseInt();          
+    Serial.println(Med_D);
+     }
+  Serial.print("Riego al día:");
+  while(Serial.available()==0)
+  {
+    //No hagas nada si no recibes nada
+  }
+   if(Serial.available()){
+    Rie_D = Serial.parseFloat();
+    Serial.println(Rie_D);          
+     }
+
+  //Intervalos de medicion
+  int hor_M = Horas_Del_Dia/Med_D;
+  long Sob_hor_M = Horas_Del_Dia%Med_D;
+  if( Sob_hor_M != 0){
+    min_M = (Sob_hor_M * 60)/Med_D; 
+  }
+  else{
+    min_M = 0;
+  }
+
+  //Intervalos de riego
+  int hor_R = Horas_Del_Dia/Rie_D;
+  long Sob_hor_R = Horas_Del_Dia%Rie_D;
+  if( Sob_hor_R != 0){
+    min_R = (Sob_hor_R * 60)/Rie_D; 
+  }
+  else{
+    min_R = 0;
+  }
+//  Serial.print("Hora Medicion: ");
+//  Serial.print(hor_M);
+//  Serial.print(":");
+//  Serial.println(min_M);
+}
+
+int Rutina(int Fecha_Accion, int hor_Accion, int min_Accion,time_t fecha_accion, time_t fecha){
+int accion;
+int Rut_Dia;
+int Horas = hour(fecha_accion) + hor_Accion;
+long Minutos = minute(fecha_accion) + min_Accion;
+
+  int Add_Horas = Minutos/60;
+  long min_sob = Minutos%60;
+  //Serial.println(min_sob);
+  //int Rut_min = min_sob*60;
+  int Rut_min = min_sob;
+int Rut_horas = Horas + Add_Horas;
+
+if(Rut_horas>24){
+  int Rut_horas_24 = Rut_horas/24;
+  long Rut_horas_sob = Rut_horas-24;
+  Rut_Dia = day(fecha_accion) + Rut_horas_24;
+  Rut_horas = Rut_horas_sob;
+  
+}
+else{
+  Rut_Dia = day(fecha_accion);
+}
+
+// If de Medicion
+Serial.print("Fecha a llegar  ");
+Serial.println(Rut_Dia);
+Serial.print("  ");
+Serial.print(Rut_horas);
+Serial.print(":");
+Serial.println(Rut_min);
+if(Rut_Dia == day(fecha) && Rut_horas == hour(fecha) && Rut_min == minute(fecha)){
+  accion = 1;
+  fecha_accion = now();}
+else{
+  accion = 0;
+}
+return accion;
+
+}
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  pinMode(Led_V, OUTPUT);
+  pinMode(Led_S, OUTPUT);
+  //setTime(hora,minutos,segundos,dia,mes,anyo);
+  setTime(19, 58, 0, 8, 12, 2021);
+  fecha = now();
+  Fecha_C = fecha;
+  Fecha_R = fecha;
+  Fecha_M = fecha;
+  Serial.print(hour(fecha));
+  Serial.print(":");
+  Serial.println(minute(fecha));
+  Intervalos();
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  int accion_M = Rutina(day(Fecha_M),hor_M,min_M,Fecha_M,fecha);
+  int accion_R = Rutina(day(Fecha_R),hor_R,min_R,Fecha_R,fecha);
+  
+  fecha = now();
+  Serial.print("Fecha actual ");
+  Serial.print(day(fecha));
+  Serial.print("  ");
+  Serial.print(hour(fecha));
+  Serial.print(":");
+  Serial.print(minute(fecha));
+  Serial.print(":");
+  Serial.println(second(fecha));
+  
+  Serial.println(accion_M);
+  Serial.println(accion_R);
+  
+  
+  if (accion_M == 1){
+    digitalWrite(Led_S,HIGH);
+    delay(500);
+    Fecha_M = now();}else{
+      digitalWrite(Led_S,LOW);
+    }
+   if (accion_R == 1){
+    digitalWrite(Led_V,HIGH);
+    delay(500);
+    Fecha_R = now();}else{
+      digitalWrite(Led_V,LOW);
+    }
+
+}
+
