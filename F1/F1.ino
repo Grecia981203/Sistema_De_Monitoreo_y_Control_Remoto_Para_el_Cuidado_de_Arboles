@@ -135,13 +135,22 @@ else{
 }
 
 // If de Medicion
-//Serial.print("Fecha a llegar  ");
-//Serial.println(Rut_Dia);
-//Serial.print("  ");
-//Serial.print(Rut_horas);
-//Serial.print(":");
-//Serial.println(Rut_min);
-if(Rut_Dia == day(fecha) && Rut_horas == hour(fecha) && Rut_min == minute(fecha)){
+Serial.print("Fecha a llegar  \t");
+Serial.println(Rut_Dia);
+Serial.print("\t");
+Serial.print(Rut_horas);
+Serial.print(":");
+Serial.println(Rut_min);
+
+Serial.print("Fecha de ahora  \t");
+Serial.print(day(fecha));
+Serial.print("\t");
+Serial.print(hour(fecha));
+Serial.print(":");
+Serial.println(minute(fecha));
+
+
+if(Rut_Dia <= day(fecha) && Rut_horas <= hour(fecha) && Rut_min <= minute(fecha)){
   accion = 1;
   fecha_accion = now();}
 else{
@@ -388,7 +397,7 @@ void setup() {
   t0=millis();
     
   //setTime(hora,minutos,segundos,dia,mes,anyo);
-  setTime(3, 48, 0, 9, 12, 2021);                 //---------------------------------------------MODIFICACIÓN DE FECHA-------------------------------------------------------
+  setTime(4, 53, 0, 12, 12, 2021);                 //---------------------------------------------MODIFICACIÓN DE FECHA-------------------------------------------------------
   fecha = now();
   Fecha_C = fecha;
   Fecha_R = fecha;
@@ -406,10 +415,19 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  fecha = now();
+  Serial.print("Fecha de ahora  \t");
+  Serial.print(day(fecha));
+  Serial.print("\t");
+  Serial.print(hour(fecha));
+  Serial.print(":");
+  Serial.println(minute(fecha));
+  Serial.println("Medicion");
   int accion_M = Rutina(day(Fecha_M),hor_M,min_M,Fecha_M,fecha);
+  Serial.println("Riego");
   int accion_R = Rutina(day(Fecha_R),hor_R,min_R,Fecha_R,fecha);
   
-  fecha = now();
+  //fecha = now();
 //  Serial.print("Fecha actual ");
 //  Serial.print(day(fecha));
 //  Serial.print("  ");
@@ -421,7 +439,10 @@ void loop() {
 //  
 //  Serial.println(accion_M);
 //  Serial.println(accion_R);
-  
+  Serial.print("M = ");
+  Serial.print(accion_M);
+  Serial.print("\t R = ");
+  Serial.println(accion_R);
   
   if (accion_M == 1){
     medir();
