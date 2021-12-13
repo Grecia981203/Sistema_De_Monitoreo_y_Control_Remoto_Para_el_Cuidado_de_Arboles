@@ -135,13 +135,22 @@ else{
 }
 
 // If de Medicion
-//Serial.print("Fecha a llegar  ");
+//Serial.print("Fecha a llegar  \t");
 //Serial.println(Rut_Dia);
-//Serial.print("  ");
+//Serial.print("\t");
 //Serial.print(Rut_horas);
 //Serial.print(":");
 //Serial.println(Rut_min);
-if(Rut_Dia == day(fecha) && Rut_horas == hour(fecha) && Rut_min == minute(fecha)){
+//
+//Serial.print("Fecha de ahora  \t");
+//Serial.print(day(fecha));
+//Serial.print("\t");
+//Serial.print(hour(fecha));
+//Serial.print(":");
+//Serial.println(minute(fecha));
+
+
+if(Rut_Dia <= day(fecha) && Rut_horas <= hour(fecha) && Rut_min <= minute(fecha)){
   accion = 1;
   fecha_accion = now();}
 else{
@@ -157,9 +166,9 @@ return accion;
 void ModoRiego()
 {
   //¿Ciclo de riego o prueba?
-  Serial.println("S5 Control y distribución de suministros");
-  Serial.println("Seleccione el modo de riego:");
-  Serial.println("0- Prueba de riego \n1-Ciclo de riego");
+//  Serial.println("S5 Control y distribución de suministros");
+//  Serial.println("Seleccione el modo de riego:");
+//  Serial.println("0- Prueba de riego \n1-Ciclo de riego");
 
 }
 
@@ -174,16 +183,16 @@ void Prueba()
                 //No hagas nada si no recibes nada
               }
           prueba_val = Serial.read();
-          Serial.println(prueba_val);
+          //Serial.println(prueba_val);
             switch(prueba_val)
             {
-              case '0': Serial.println("Abriendo válvula 1"); 
+              case '0': //Serial.println("Abriendo válvula 1"); 
                         digitalWrite(VS1,HIGH);
                         delay(3000);
                         digitalWrite(VS1,LOW);
                         //Abrir válvula y cerrar con un delay para prueba. LED para observar
                         break;
-              case '1': Serial.println("Abriendo válvula 2"); 
+              case '1': //Serial.println("Abriendo válvula 2"); 
                         digitalWrite(VS2,HIGH);
                         delay(1000);
                         digitalWrite(VS2,LOW);
@@ -247,6 +256,8 @@ int ObtenerFrecuecia()
   delay(500);   //muestra de 1 segundo
   noInterrupts(); //Deshabilitamos  las interrupciones
   frecuencia_a= NumPulsosA; //Hz(pulsos por segundo)
+//  Serial.print
+//  Serial.println(frecuencia_a);
   return frecuencia_a;
 }
 
@@ -270,7 +281,7 @@ int ObtenerFrecueciaF()
 
 void CicloRiego()
 {
-  Serial.println("Entrando a ciclo de riego");
+  //Serial.println("Entrando a ciclo de riego");
   //Obtenemos datos de sensores
   //---Agua---
   float frecuencia_a=ObtenerFrecuecia(); //obtenemos la frecuencia de los pulsos en Hz
@@ -293,14 +304,14 @@ void CicloRiego()
   //---AGUA----
   if(volumen_a<volumen_a_final){
 
-    Serial.println("V_agua Abierta");
+    //Serial.println("V_agua Abierta");
     digitalWrite(VS1,HIGH);
   }
   else if(volumen_a>=volumen_a_final){
       
       digitalWrite(VS1,LOW);
       
-    Serial.println("V_agua Cerrada");
+    //Serial.println("V_agua Cerrada");
       
     }
  
@@ -309,37 +320,37 @@ void CicloRiego()
   if(volumen_f<volumen_f_final){
     digitalWrite(VS2,HIGH);
   
-    Serial.println("V_fer Abierta");
+    //Serial.println("V_fer Abierta");
   } 
   else if(volumen_f>=volumen_f_final){
       
       digitalWrite(VS2,LOW);
       
-    Serial.println("V_fert Cerrada");
+    //Serial.println("V_fert Cerrada");
       }
 
   
-  Serial.print    ("Numero de Pulsos Agua = "); 
-  Serial.print    (NumPulsosA); 
-  Serial.print    ("\t Numero de Pulsos Fertilizante = ");
-  Serial.println  (NumPulsosF);
-  Serial.println  ("Caudal agua: \t\t\t Caudal fertilizante:"); 
-  Serial.print    (caudal_L_m_a,3);
-  Serial.print    ("L/min\t\t\t"); 
-  Serial.print    (caudal_L_m_f,3);
-  Serial.println  ("L/min");
-  Serial.print    (caudal_L_h_a,3); 
-  Serial.print    ("L/h\t\t\t");   
-  Serial.print    (caudal_L_h_f,3);
-  Serial.println  ("L/h");
-  Serial.print    (volumen_a,3); 
-  Serial.print    (" L\t\t\t\t");
-  Serial.print    (volumen_f,3);
-  Serial.println  ("L");
-  Serial.print    (volumen_a_final);
-  Serial.print    (" L\t\t\t\t");
-  Serial.print    (volumen_f_final);
-  Serial.println  (" L");
+//  Serial.print    ("Numero de Pulsos Agua = "); 
+//  Serial.print    (NumPulsosA); 
+//  Serial.print    ("\t Numero de Pulsos Fertilizante = ");
+//  Serial.println  (NumPulsosF);
+//  Serial.println  ("Caudal agua: \t\t\t Caudal fertilizante:"); 
+//  Serial.print    (caudal_L_m_a,3);
+//  Serial.print    ("L/min\t\t\t"); 
+//  Serial.print    (caudal_L_m_f,3);
+//  Serial.println  ("L/min");
+//  Serial.print    (caudal_L_h_a,3); 
+//  Serial.print    ("L/h\t\t\t");   
+//  Serial.print    (caudal_L_h_f,3);
+//  Serial.println  ("L/h");
+//  Serial.print    (volumen_a,3); 
+//  Serial.print    (" L\t\t\t\t");
+//  Serial.print    (volumen_f,3);
+//  Serial.println  ("L");
+//  Serial.print    (volumen_a_final);
+//  Serial.print    (" L\t\t\t\t");
+//  Serial.print    (volumen_f_final);
+//  Serial.println  (" L");
 //  Serial.print("Volumen_Fi \t");
 //  Serial.print(volumen_f);
 //  Serial.print("Volumen_Ai \t");
@@ -388,7 +399,7 @@ void setup() {
   t0=millis();
     
   //setTime(hora,minutos,segundos,dia,mes,anyo);
-  setTime(3, 48, 0, 9, 12, 2021);                 //---------------------------------------------MODIFICACIÓN DE FECHA-------------------------------------------------------
+  setTime(4, 53, 0, 12, 12, 2021);                 //---------------------------------------------MODIFICACIÓN DE FECHA-------------------------------------------------------
   fecha = now();
   Fecha_C = fecha;
   Fecha_R = fecha;
@@ -406,10 +417,19 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  fecha = now();
+//  Serial.print("Fecha de ahora  \t");
+//  Serial.print(day(fecha));
+//  Serial.print("\t");
+//  Serial.print(hour(fecha));
+//  Serial.print(":");
+//  Serial.println(minute(fecha));
+//  Serial.println("Medicion");
   int accion_M = Rutina(day(Fecha_M),hor_M,min_M,Fecha_M,fecha);
+//  Serial.println("Riego");
   int accion_R = Rutina(day(Fecha_R),hor_R,min_R,Fecha_R,fecha);
   
-  fecha = now();
+  //fecha = now();
 //  Serial.print("Fecha actual ");
 //  Serial.print(day(fecha));
 //  Serial.print("  ");
@@ -421,7 +441,10 @@ void loop() {
 //  
 //  Serial.println(accion_M);
 //  Serial.println(accion_R);
-  
+//  Serial.print("M = ");
+//  Serial.print(accion_M);
+//  Serial.print("\t R = ");
+//  Serial.println(accion_R);
   
   if (accion_M == 1){
     medir();
@@ -436,44 +459,31 @@ void loop() {
     medir();
     digitalWrite(AlimentacionS,LOW);
     band_R=1;
-    Serial.println("Antes del IF de Regarrr");
-    Serial.println(Prom_SensorT);
-    Serial.println(Prom_SensorH);
+//    Serial.println("Antes del IF de Regarrr");
+//    Serial.println(Prom_SensorT);
+//    Serial.println(Prom_SensorH);
     int i = 0;
     if(Prom_SensorT > 6 && Prom_SensorT<30 && Prom_SensorH < 130){
-      Serial.print("Entro al If");
+//      Serial.print("Entro al If");
       do{ 
-      Serial.print("Regando");
+//      Serial.print("Regando");
       i = i + 1;
-//      digitalWrite(alim_SF1,HIGH);
-//      digitalWrite(alim_SF2,HIGH);
-      //regar();
-//      Serial.print("Volumen_Fi \t");
-//      Serial.print(volumen_f);
-//      Serial.print("Volumen_Ai \t");
-//      Serial.println(volumen_a);
-//      Serial.print("Volumen_Ff \t");
-//      Serial.print(volumen_f_final);
-//      Serial.print("Volumen_Af \t");
-//      Serial.print(volumen_a_final);
-      //if(volumen_f>=volumen_f_final&&volumen_a>=volumen_a_final){
-      if(i == 10){
+      regar();
+
+      if(volumen_f>=volumen_f_final&&volumen_a>=volumen_a_final){
+      //if(i == 10){
         //Serial.print("A Bandera de Riego Dentro de If \t");
-        Serial.println(band_R);
+        //Serial.println(band_R);
         band_R=0;
       } 
-        Serial.print("B Bandera de Riego Fuera de If \t");
-        Serial.println(band_R);
-      }while(band_R==1);
-         
-      Serial.print("Sale de while");
-      //digitalWrite(alim_SF1,HIGH);
-      //digitalWrite(alim_SF2,HIGH);
-      //regar();
-      
+        //Serial.print("B Bandera de Riego Fuera de If \t");
+        //Serial.println(band_R);
+      }while(band_R==1); 
+      //Serial.print("Sale de while");
     }
     digitalWrite(Led_V,HIGH);
     delay(500);
+    //setTime(hour(now()), minute(now()), second(now()), day(now()), month(now()), year(now())); 
     Fecha_R = now();}else{
       //Serial.println("No hay riego");
       
@@ -522,14 +532,10 @@ void medir(){
   Serial.println(i);
   Serial.println(" ");
 
-  Serial.print("Promedio T, H: "); 
-  Serial.print(Prom_SensorT); 
-  Serial.print("\t");
-  Serial.println(Prom_SensorH);
- 
-  // Espera un minuto
-  //delay(60000);
-
+//  Serial.print("Promedio T, H: "); 
+//  Serial.print(Prom_SensorT); 
+//  Serial.print("\t");
+//  Serial.println(Prom_SensorH);
 }
 
 void regar(){
@@ -537,8 +543,6 @@ void regar(){
   Serial.println("Entro");
   digitalWrite(alim_SF1,HIGH);
   digitalWrite(alim_SF2,HIGH);
- CicloRiego(); 
-// if(volumen_f>=volumen_f_final&&volumen_a>=volumen_a_final){
-//    band_R=0;
-//    } 
+  CicloRiego(); 
+
 }
