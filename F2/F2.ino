@@ -43,11 +43,11 @@ int lectura_SF1 =2;     //Pin lectura de sensor de flujo 1 Agua INT0
 int lectura_SF2 =3;     //Pin lectura de sensor de flujo 2 Fertilizante INT1
 
   //--AJUSTAR--  
-int alim_SF1 =8;       //Pin alimentación de sensor de flujo 1
-int alim_SF2 =7;       //Pin alimentación de sensor de flujo 2
+int alim_SF1 =7;       //Pin alimentación de sensor de flujo 1
+int alim_SF2 =8;       //Pin alimentación de sensor de flujo 2
   //Salida del control
-int VS1 =5;       //Pin alimentación de válvula solenoide 1 PWM
-int VS2 =6;        //Pin alimentación de válvula solnoide 2 PWM
+int VS1 =6;       //Pin alimentación de válvula solenoide 1 PWM
+int VS2 =5;        //Pin alimentación de válvula solnoide 2 PWM
 
 //Variables--------------
 
@@ -67,6 +67,27 @@ char prueba_val;
 
 //Bandera de riego
 int band_R = 0;
+
+
+//---Funciones que se ejecuta en interrupción---------------
+void ContarPulsosAgua()
+{ 
+  NumPulsosA++;  //incrementamos la variable de pulsos
+}
+
+ void ContarPulsosFert ()
+{ 
+  NumPulsosF++;  //incrementamos la variable de pulsos
+} 
+//---------------------------------------------------------
+
+
+//--Función para la definición de intervalos de acciones--
+void own_delay(int time_d){
+  interrupts();
+  delay(time_d);
+  noInterrupts();
+  }
 
 
 void Intervalos(){
@@ -109,12 +130,14 @@ void Intervalos(){
     min_R = 0;
   }
 }
+//--------------------------------------------------------------
 
+//---Función para rutinas, conversión de horas, ajuste de días------------------
 int Rutina(int Fecha_Accion, int hor_Accion, int min_Accion,time_t fecha_accion, time_t fecha){
 int accion;
 int Rut_Dia;
 int Horas = hour(fecha_accion) + hor_Accion;
-long Minutos = minute(fecha_accion) + min_Accion;
+long Minutos =  minute(fecha_accion) + min_Accion;
 
   int Add_Horas = Minutos/60;
   long min_sob = Minutos%60;
@@ -159,9 +182,11 @@ else{
 return accion;
 
 }
+//-------------------------------------------------------
+
+//---Funciones para el control----------------------------
 
 
-//control----
 //----Modo de riego----
 void ModoRiego()
 {
@@ -188,13 +213,13 @@ void Prueba()
             {
               case '0': //Serial.println("Abriendo válvula 1"); 
                         digitalWrite(VS1,HIGH);
-                        delay(3000);
+                        own_delay(1000);
                         digitalWrite(VS1,LOW);
                         //Abrir válvula y cerrar con un delay para prueba. LED para observar
                         break;
               case '1': //Serial.println("Abriendo válvula 2"); 
                         digitalWrite(VS2,HIGH);
-                        delay(1000);
+                        own_delay(1000);
                         digitalWrite(VS2,LOW);
                         //Abrir válvula y cerrar con un delay para prueba. LED para observar
                         break;
@@ -233,20 +258,6 @@ float VolumenCaptura_A(){
   }
 
 
-//---Funciones que se ejecuta en interrupción---------------
-void ContarPulsosAgua()
-{ 
-  NumPulsosA++;  //incrementamos la variable de pulsos
-}
-
- void ContarPulsosFert ()
-{ 
-  NumPulsosF++;  //incrementamos la variable de pulsos
-} 
-//---------------------------------------------------------
-
-
-
 //---Función para obtener frecuencia de los pulsos--------
 int ObtenerFrecuecia() 
 {
@@ -274,8 +285,6 @@ int ObtenerFrecueciaF()
   return frecuencia_f;
 }
 //----------------------------------------------------
-
-
 
 
 
@@ -313,7 +322,7 @@ void CicloRiego()
       
     //Serial.println("V_agua Cerrada");
       
-    }
+      }
  
       
   //---FERTILIZANTE---
@@ -330,10 +339,10 @@ void CicloRiego()
       }
 
   
-//  Serial.print    ("Numero de Pulsos Agua = "); 
-//  Serial.print    (NumPulsosA); 
-//  Serial.print    ("\t Numero de Pulsos Fertilizante = ");
-//  Serial.println  (NumPulsosF);
+  Serial.print    ("Numero de Pulsos Agua = "); 
+  Serial.print    (NumPulsosA); 
+  Serial.print    ("\t Numero de Pulsos Fertilizante = ");
+  Serial.println  (NumPulsosF);
 //  Serial.println  ("Caudal agua: \t\t\t Caudal fertilizante:"); 
 //  Serial.print    (caudal_L_m_a,3);
 //  Serial.print    ("L/min\t\t\t"); 
@@ -343,14 +352,15 @@ void CicloRiego()
 //  Serial.print    ("L/h\t\t\t");   
 //  Serial.print    (caudal_L_h_f,3);
 //  Serial.println  ("L/h");
-//  Serial.print    (volumen_a,3); 
-//  Serial.print    (" L\t\t\t\t");
-//  Serial.print    (volumen_f,3);
-//  Serial.println  ("L");
-//  Serial.print    (volumen_a_final);
-//  Serial.print    (" L\t\t\t\t");
-//  Serial.print    (volumen_f_final);
-//  Serial.println  (" L");
+  Serial.println  ("Volumen agua: \t\t\t Volumen fertilizante:");
+  Serial.print    (volumen_a,3); 
+  Serial.print    (" L\t\t\t\t");
+  Serial.print    (volumen_f,3);
+  Serial.println  ("L");
+  Serial.print    (volumen_a_final);
+  Serial.print    (" L\t\t\t\t");
+  Serial.print    (volumen_f_final);
+  Serial.println  (" L");
 //  Serial.print("Volumen_Fi \t");
 //  Serial.print(volumen_f);
 //  Serial.print("Volumen_Ai \t");
@@ -360,137 +370,13 @@ void CicloRiego()
 //  Serial.print("Volumen_Af \t");
 //  Serial.println(volumen_a_final);
 
-//  if(volumen_f>=volumen_f_final&&volumen_a>=volumen_a_final){
-//      band_R=0;
-//    }   
+  if(volumen_f>=volumen_f_final&&volumen_a>=volumen_a_final){
+      band_R=0;
+    }   
 
 }
 
 
-void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
-  pinMode(Led_V, OUTPUT);
-  pinMode(Led_S, OUTPUT);
-  pinMode(AlimentacionS, OUTPUT);  
-  pinMode(sensorH1, INPUT);  
-  pinMode(sensorH2, INPUT);
-  pinMode(sensorH3, INPUT);
-  //---pinMode--- INPUT's
-  pinMode(lectura_SF1, INPUT);
-  pinMode(lectura_SF2, INPUT);
-  //---pinMode---- OUTPUT's
-  pinMode(alim_SF1, OUTPUT);  
-  pinMode(alim_SF2, OUTPUT);
-  pinMode(VS1, OUTPUT);
-  pinMode(VS2, OUTPUT);
-
-  //Iniciamos cerradas las válvulas
-  digitalWrite(VS1,LOW);
-  digitalWrite(VS2,LOW);
-  
-  // Iniciamos el bus 1-Wire
-  sensorDS18B20.begin();
-
-
-  //Interrupciones
-  attachInterrupt(0,ContarPulsosAgua,RISING);//(Interrupción 0(Pin2),función,Flanco de subida)
-  attachInterrupt(1,ContarPulsosFert,RISING);//(Interrupción 1(Pin3),función,Flanco de subida)
-  t0=millis();
-    
-  //setTime(hora,minutos,segundos,dia,mes,anyo);
-  setTime(4, 53, 0, 12, 12, 2021);                 //---------------------------------------------MODIFICACIÓN DE FECHA-------------------------------------------------------
-  fecha = now();
-  Fecha_C = fecha;
-  Fecha_R = fecha;
-  Fecha_M = fecha;
-  Serial.print(hour(fecha));
-  Serial.print(":");
-  Serial.println(minute(fecha));
-  Intervalos();
-
-  volumen_a_final = VolumenCaptura_A();
-  Serial.println(volumen_a_final);
-  volumen_f_final = VolumenCaptura_F();  
-  Serial.println(volumen_f_final);
-  }
-
-void loop() {
-  // put your main code here, to run repeatedly:
-  fecha = now();
-//  Serial.print("Fecha de ahora  \t");
-//  Serial.print(day(fecha));
-//  Serial.print("\t");
-//  Serial.print(hour(fecha));
-//  Serial.print(":");
-//  Serial.println(minute(fecha));
-//  Serial.println("Medicion");
-  int accion_M = Rutina(day(Fecha_M),hor_M,min_M,Fecha_M,fecha);
-//  Serial.println("Riego");
-  int accion_R = Rutina(day(Fecha_R),hor_R,min_R,Fecha_R,fecha);
-  
-  //fecha = now();
-//  Serial.print("Fecha actual ");
-//  Serial.print(day(fecha));
-//  Serial.print("  ");
-//  Serial.print(hour(fecha));
-//  Serial.print(":");
-//  Serial.print(minute(fecha));
-//  Serial.print(":");
-//  Serial.println(second(fecha));
-//  
-//  Serial.println(accion_M);
-//  Serial.println(accion_R);
-//  Serial.print("M = ");
-//  Serial.print(accion_M);
-//  Serial.print("\t R = ");
-//  Serial.println(accion_R);
-  
-  if (accion_M == 1){
-    medir();
-    digitalWrite(Led_S,HIGH);
-    delay(500);
-    Fecha_M = now();}else{
-      digitalWrite(AlimentacionS,LOW);
-      digitalWrite(Led_S,LOW);
-      
-    }
-   if (accion_R == 1){
-    medir();
-    digitalWrite(AlimentacionS,LOW);
-    band_R=1;
-//    Serial.println("Antes del IF de Regarrr");
-//    Serial.println(Prom_SensorT);
-//    Serial.println(Prom_SensorH);
-    int i = 0;
-    if(Prom_SensorT > 6 && Prom_SensorT<30 && Prom_SensorH < 130){
-//      Serial.print("Entro al If");
-      do{ 
-//      Serial.print("Regando");
-      i = i + 1;
-      regar();
-
-      if(volumen_f>=volumen_f_final&&volumen_a>=volumen_a_final){
-      //if(i == 10){
-        //Serial.print("A Bandera de Riego Dentro de If \t");
-        //Serial.println(band_R);
-        band_R=0;
-      } 
-        //Serial.print("B Bandera de Riego Fuera de If \t");
-        //Serial.println(band_R);
-      }while(band_R==1); 
-      //Serial.print("Sale de while");
-    }
-    digitalWrite(Led_V,HIGH);
-    delay(500);
-    //setTime(hour(now()), minute(now()), second(now()), day(now()), month(now()), year(now())); 
-    Fecha_R = now();}else{
-      //Serial.println("No hay riego");
-      
-      digitalWrite(Led_V,LOW);
-    }
-
-}
 
 void medir(){
   digitalWrite(AlimentacionS,HIGH);
@@ -532,10 +418,10 @@ void medir(){
   Serial.println(i);
   Serial.println(" ");
 
-//  Serial.print("Promedio T, H: "); 
-//  Serial.print(Prom_SensorT); 
-//  Serial.print("\t");
-//  Serial.println(Prom_SensorH);
+  Serial.print("Promedio T, H: "); 
+  Serial.print(Prom_SensorT); 
+  Serial.print("\t");
+  Serial.println(Prom_SensorH);
 }
 
 void regar(){
@@ -544,5 +430,136 @@ void regar(){
   digitalWrite(alim_SF1,HIGH);
   digitalWrite(alim_SF2,HIGH);
   CicloRiego(); 
+
+}
+
+
+
+
+//--------------------------------------------------------
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  pinMode(Led_V, OUTPUT);
+  pinMode(Led_S, OUTPUT);
+  pinMode(AlimentacionS, OUTPUT);  
+  pinMode(sensorH1, INPUT);  
+  pinMode(sensorH2, INPUT);
+  pinMode(sensorH3, INPUT);
+  //---pinMode--- INPUT's
+  pinMode(lectura_SF1, INPUT);
+  pinMode(lectura_SF2, INPUT);
+  //---pinMode---- OUTPUT's
+  pinMode(alim_SF1, OUTPUT);  
+  pinMode(alim_SF2, OUTPUT);
+  pinMode(VS1, OUTPUT);
+  pinMode(VS2, OUTPUT);
+
+  //Iniciamos cerradas las válvulas
+  digitalWrite(VS1,LOW);
+  digitalWrite(VS2,LOW);
+  
+  // Iniciamos el bus 1-Wire
+  sensorDS18B20.begin();
+
+
+  //Definición de interrupciones
+  attachInterrupt(0,ContarPulsosAgua,RISING);//(Interrupción 0(Pin2),función,Flanco de subida)
+  attachInterrupt(1,ContarPulsosFert,RISING);//(Interrupción 1(Pin3),función,Flanco de subida)
+  t0=millis();
+    
+  //setTime(hora,minutos,segundos,dia,mes,anyo);
+  setTime(4, 53, 0, 12, 12, 2021);                 //---------------------------------------------MODIFICACIÓN DE FECHA-------------------------------------------------------
+  fecha = now();
+  Fecha_C = fecha;
+  Fecha_R = fecha;
+  Fecha_M = fecha;
+  Serial.print(hour(fecha));
+  Serial.print(":");
+  Serial.println(minute(fecha));
+  Intervalos();
+
+  volumen_a_final = VolumenCaptura_A();
+  Serial.println(volumen_a_final);
+  volumen_f_final = VolumenCaptura_F();  
+  Serial.println(volumen_f_final);
+  }
+
+
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  fecha = now();
+//  Serial.print("Fecha de ahora  \t");
+//  Serial.print(day(fecha));
+//  Serial.print("\t");
+//  Serial.print(hour(fecha));
+//  Serial.print(":");
+//  Serial.println(minute(fecha));
+//  Serial.println("Medicion");
+  int accion_M = Rutina(day(Fecha_M),hor_M,min_M,Fecha_M,fecha);
+//  Serial.println("Riego");
+  int accion_R = Rutina(day(Fecha_R),hor_R,min_R,Fecha_R,fecha);
+  
+  //fecha = now();
+//  Serial.print("Fecha actual ");
+//  Serial.print(day(fecha));
+//  Serial.print("  ");
+//  Serial.print(hour(fecha));
+//  Serial.print(":");
+//  Serial.print(minute(fecha));
+//  Serial.print(":");
+//  Serial.println(second(fecha));
+//  
+//  Serial.println(accion_M);
+//  Serial.println(accion_R);
+//  Serial.print("M = ");
+//  Serial.print(accion_M);
+//  Serial.print("\t R = ");
+//  Serial.println(accion_R);
+  
+  if (accion_M == 1){
+    medir();
+    digitalWrite(Led_S,HIGH);
+    interrupts();
+    delay(500);
+    
+    Fecha_M = now();}
+    else{
+      digitalWrite(AlimentacionS,LOW);
+      digitalWrite(Led_S,LOW);
+      
+    }
+   if (accion_R == 1){
+    medir();
+    digitalWrite(AlimentacionS,LOW);
+    band_R=1;
+//    Serial.println("Antes del IF de Regarrr");
+    Serial.println(Prom_SensorT);
+    Serial.println(Prom_SensorH);
+    //int i = 0;
+    if(Prom_SensorT > 6 && Prom_SensorT<30 && Prom_SensorH < 130){
+//      Serial.print("Entro al If");
+      do{ 
+//      Serial.print("Regando");
+      //i = i + 1;
+      regar();
+
+    }while(band_R==1);
+    volumen_f = 0;
+    volumen_a = 0;
+    //digitalWrite(Led_V,HIGH);
+    interrupts();
+    delay(500);
+    //setTime(hour(now()), minute(now()), second(now()), day(now()), month(now()), year(now())); 
+    Fecha_R = now();}
+    else{
+      //Serial.println("No hay riego");
+      
+     //digitalWrite(Led_V,LOW);
+      }
+    
+    }
 
 }
